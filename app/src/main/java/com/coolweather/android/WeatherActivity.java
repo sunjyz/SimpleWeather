@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.coolweather.android.gson.Forecast;
+import com.coolweather.android.gson.Hourly_Forecast;
 import com.coolweather.android.gson.Weather;
 import com.coolweather.android.service.AutoUpdateService;
 import com.coolweather.android.util.HttpUtil;
@@ -49,6 +50,8 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView sportText;
     private ImageView bingPicImg;
     private String mWeatherId;
+
+    private LinearLayout hourlyForecastLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +78,9 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
         navButton=(Button)findViewById(R.id.nav_button);
+
+        hourlyForecastLayout=(LinearLayout)findViewById(R.id.hourly_forecast_layout);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString =prefs.getString("weather",null);
 
@@ -192,6 +198,19 @@ public class WeatherActivity extends AppCompatActivity {
             degreeText.setText(degree);
             weatherInfoText.setText(weatherInfo);
             forecastLayout.removeAllViews();
+
+            hourlyForecastLayout.removeAllViews();
+            for(Hourly_Forecast hourly_forecast:weather.hourlyForecastList){
+                View viewh=LayoutInflater.from(this).inflate(R.layout.hourly_forecast_item,hourlyForecastLayout,false);
+                TextView hourlyDataText=(TextView)viewh.findViewById(R.id.hourly_date_text);
+                TextView hourlyInfoText=(TextView)viewh.findViewById(R.id.hourly_info_text);
+                TextView hourlyTmpText=(TextView)viewh.findViewById(R.id.hourly_tmp_text);
+                hourlyDataText.setText(hourly_forecast.hourlyForecastTime);
+                hourlyInfoText.setText(hourly_forecast.hourlyMore.hourlyForecastInfo);
+                hourlyTmpText.setText(hourly_forecast.hourlyForecastTemp+"℃");
+                hourlyForecastLayout.addView(viewh);
+            }
+
             for (Forecast forecast : weather.forecastList) {
                 View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
                 TextView dateText = (TextView) view.findViewById(R.id.date_text);
@@ -200,8 +219,8 @@ public class WeatherActivity extends AppCompatActivity {
                 TextView minText = (TextView) view.findViewById(R.id.min_text);
                 dateText.setText(forecast.date);
                 infoText.setText(forecast.more.info);
-                maxText.setText(forecast.temperature.max);
-                minText.setText(forecast.temperature.min);
+                maxText.setText(forecast.temperature.max+"℃");
+                minText.setText(forecast.temperature.min+"℃");
                 forecastLayout.addView(view);
             }
             if (weather.aqi != null) {
