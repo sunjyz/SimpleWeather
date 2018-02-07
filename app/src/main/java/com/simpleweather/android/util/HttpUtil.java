@@ -1,4 +1,4 @@
-package com.coolweather.android.util;
+package com.simpleweather.android.util;
 
 import okhttp3.*;
 
