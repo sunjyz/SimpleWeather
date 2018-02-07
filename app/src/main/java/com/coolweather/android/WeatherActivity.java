@@ -205,7 +205,11 @@ public class WeatherActivity extends AppCompatActivity {
                 TextView hourlyDataText=(TextView)viewh.findViewById(R.id.hourly_date_text);
                 TextView hourlyInfoText=(TextView)viewh.findViewById(R.id.hourly_info_text);
                 TextView hourlyTmpText=(TextView)viewh.findViewById(R.id.hourly_tmp_text);
-                hourlyDataText.setText(hourly_forecast.hourlyForecastTime);
+
+                String mVar=hourly_forecast.hourlyForecastTime;
+                String modifiedTime=mVar.substring(mVar.length()-5,mVar.length());//仅获取时间
+                hourlyDataText.setText(modifiedTime);
+
                 hourlyInfoText.setText(hourly_forecast.hourlyMore.hourlyForecastInfo);
                 hourlyTmpText.setText(hourly_forecast.hourlyForecastTemp+"℃");
                 hourlyForecastLayout.addView(viewh);
