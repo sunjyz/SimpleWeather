@@ -19,6 +19,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.bumptech.glide.Glide;
 import com.simpleweather.android.gson.Forecast;
 import com.simpleweather.android.gson.Hourly_Forecast;
@@ -34,8 +38,10 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class WeatherActivity extends AppCompatActivity {
+
     public DrawerLayout drawerLayout;
     private Button navButton;
+    private Button locButton;
     public SwipeRefreshLayout swipeRefresh;
     private ScrollView weatherLayout;
     private TextView titleCity;
@@ -50,6 +56,8 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView sportText;
     private ImageView bingPicImg;
     private String mWeatherId;
+    private LocationClient mLocationClient;
+    private String mLocation;
 
     private LinearLayout hourlyForecastLayout;
     @Override
@@ -61,6 +69,11 @@ public class WeatherActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         setContentView(R.layout.activity_weather);
+        mLocationClient=new LocationClient(MyApplication.getContext());
+        mLocationClient.registerLocationListener(new MyLocationListener());
+        LocationClientOption option=new LocationClientOption();
+        option.setIsNeedAddress(true);
+        mLocationClient.setLocOption(option);
         //初始化各控件
         bingPicImg =(ImageView)findViewById(R.id.bing_pic_img);
         weatherLayout=(ScrollView)findViewById(R.id.weather_layout);
@@ -78,6 +91,7 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
         navButton=(Button)findViewById(R.id.nav_button);
+        locButton=(Button)findViewById(R.id.location_button);
 
         hourlyForecastLayout=(LinearLayout)findViewById(R.id.hourly_forecast_layout);
 
@@ -116,6 +130,23 @@ public class WeatherActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+
+        //定位并刷新
+        locButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLocationClient.start();
+                if(mLocation!=null) {
+                    mWeatherId=mLocation;
+                    requestWeather(mWeatherId);
+                }else {
+                    Toast.makeText(WeatherActivity.this,"获取地址失败，请尝试手动选择",Toast.LENGTH_SHORT).show();
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+            }
+
+        });
+
     }
     /**
      * 根据天气id请求城市天气信息
@@ -138,6 +169,7 @@ public class WeatherActivity extends AppCompatActivity {
                             showWeatherInfo(weather);
                         }else {
                             Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
+                            drawerLayout.openDrawer(GravityCompat.START);
                         }
                         swipeRefresh.setRefreshing(false);
                     }
@@ -150,6 +182,7 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
+                        drawerLayout.openDrawer(GravityCompat.START);
                         swipeRefresh.setRefreshing(false);
                     }
                 });
@@ -244,4 +277,11 @@ public class WeatherActivity extends AppCompatActivity {
             Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
         }
     }
+    public class MyLocationListener implements BDLocationListener {
+        @Override
+        public void onReceiveLocation(BDLocation Location) {
+            mLocation=Location.getDistrict();
+        }
+    }
+
 }
