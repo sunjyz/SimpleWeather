@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
         List<String> permissionList =new ArrayList<>();
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.
                 permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
@@ -49,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, WeatherActivity.class);
                 startActivity(intent);
                 finish();
+            }else {
+                Intent intent = new Intent(this, WeatherActivity.class);
+                intent.putExtra("weather_id","北京");
+                startActivity(intent);
+                finish();
             }
         }
     }
@@ -65,9 +70,15 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
                     }
-                    SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
-                    if(prefs.getString("weather",null)!=null){
-                        Intent intent=new Intent(this,WeatherActivity.class);
+                    //如果同意使用权限则步入以下代码
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                    if (prefs.getString("weather", null) != null) {
+                        Intent intent = new Intent(this, WeatherActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }else {
+                        Intent intent = new Intent(this, WeatherActivity.class);
+                        intent.putExtra("weather_id","北京");
                         startActivity(intent);
                         finish();
                     }

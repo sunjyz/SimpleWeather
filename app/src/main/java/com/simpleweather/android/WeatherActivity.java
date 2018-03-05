@@ -74,6 +74,7 @@ public class WeatherActivity extends AppCompatActivity {
         LocationClientOption option=new LocationClientOption();
         option.setIsNeedAddress(true);
         mLocationClient.setLocOption(option);
+        mLocationClient.start();
         //初始化各控件
         bingPicImg =(ImageView)findViewById(R.id.bing_pic_img);
         weatherLayout=(ScrollView)findViewById(R.id.weather_layout);
@@ -110,6 +111,7 @@ public class WeatherActivity extends AppCompatActivity {
             requestWeather(mWeatherId);
         }
 
+
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
             public void onRefresh(){
@@ -136,8 +138,17 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mLocationClient.start();
+
                 if(mLocation!=null) {
-                    mWeatherId=mLocation;
+                    if(mLocation.equals("浦东新区")){
+                      mWeatherId=mLocation;
+                    }else {
+                        mWeatherId=mLocation.substring(0,mLocation.length()-1);
+                    }
+
+
+                    Toast.makeText(WeatherActivity.this,"已定位至"+mWeatherId,Toast.LENGTH_SHORT).show();
+//                    mWeatherId=mLocation;//修改地址位置。
                     requestWeather(mWeatherId);
                 }else {
                     Toast.makeText(WeatherActivity.this,"获取地址失败，请尝试手动选择",Toast.LENGTH_SHORT).show();
@@ -283,5 +294,6 @@ public class WeatherActivity extends AppCompatActivity {
             mLocation=Location.getDistrict();
         }
     }
+
 
 }
